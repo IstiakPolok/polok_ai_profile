@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.firaCodeTextTheme(ThemeData.dark().textTheme),
         scaffoldBackgroundColor: const Color(0xFF1E1E1E),
       ),
-      home: const MainLayout(),
+      home: PortfolioScreen(onBack: () {}),
     );
   }
 }

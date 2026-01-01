@@ -1,0 +1,7 @@
+{
+    "name": "polok_ai_profile",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "bash build.sh"
+    }
+}

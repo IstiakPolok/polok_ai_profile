@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.firaCodeTextTheme(ThemeData.dark().textTheme),
         scaffoldBackgroundColor: const Color(0xFF1E1E1E),
       ),
-      home: PortfolioScreen(onBack: () {}),
+      home: const MainLayout(),
     );
   }
 }
@@ -53,7 +53,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
   bool _isSidebarOpen = true;
-  bool _showPortfolio = false;
+  bool _showPortfolio = true;
 
   @override
   Widget build(BuildContext context) {
@@ -656,11 +656,15 @@ class _ChatViewState extends State<ChatView> {
   }
 
   void _addInitialMessage() {
+    final apiKey = dotenv.env['GEMINI_API_KEY'] ?? "";
+    final isPlaceholder = apiKey == "YOUR_GROQ_API_KEY_HERE" || apiKey.isEmpty;
+
     setState(() {
       _messages.add(
         ChatMessage(
-          text:
-              "Hi! I'm Polok's AI Assistant. Ask me anything about his experience, skills, or projects!",
+          text: isPlaceholder
+              ? "👋 Hi! It looks like your AI Chat isn't set up yet. To enable it, please add your Groq API key to the .env file in the root directory.\n\nType 'help' to see how!"
+              : "Hi! I'm Polok's AI Assistant. Ask me anything about his experience, skills, or projects!",
           isUser: false,
         ),
       );
@@ -1153,14 +1157,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ),
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 800.ms, curve: Curves.easeOut).slideY(begin: 0.1);
 
-    final image = Center(
-      child: Image.asset(
-        'assets/images/profile.png',
-        width: isMobile ? 300 : 400,
-      ),
-    );
+    final image =
+        Center(
+              child: Image.asset(
+                'assets/images/profile.png',
+                width: isMobile ? 300 : 400,
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 800.ms)
+            .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack);
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -1211,7 +1219,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
-          ),
+          ).animate().fadeIn().slideX(begin: -0.2),
           const SizedBox(height: 10),
           const Text(
             "Lorem ipsum dolor sit amet consectetur. Imperdiet convallis blandit felis ligula aliquam",
@@ -1226,25 +1234,25 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             mainAxisSpacing: 20,
             crossAxisSpacing: 20,
             childAspectRatio: isMobile ? 1.5 : 1.2,
-            children: const [
-              _ServiceCard(
+            children: [
+              const _ServiceCard(
                 title: "App Design",
                 icon: Icons.phone_android,
                 desc:
-                    "Lorem ipsum dolor sit amet. Imperdiet Lorem ipsum dolor sit amet consectetur",
-              ),
-              _ServiceCard(
+                    "Crafting beautiful and functional mobile applications using Flutter and modern design principles.",
+              ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
+              const _ServiceCard(
                 title: "Web Design",
                 icon: Icons.web,
                 desc:
-                    "Lorem ipsum dolor sit amet. Imperdiet Lorem ipsum dolor sit amet consectetur",
-              ),
-              _ServiceCard(
+                    "Creating responsive and interactive web experiences that look great on any device.",
+              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+              const _ServiceCard(
                 title: "UI/UX Design",
                 icon: Icons.design_services,
                 desc:
-                    "Lorem ipsum dolor sit amet. Imperdiet Lorem ipsum dolor sit amet consectetur",
-              ),
+                    "Focusing on user-centric design to provide intuitive and engaging digital interfaces.",
+              ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2),
             ],
           ),
         ],
@@ -1305,7 +1313,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
-          ),
+          ).animate().fadeIn().slideX(begin: -0.2),
           const SizedBox(height: 10),
           const Text(
             "User Interface And User Experience And Also Video Editing",
@@ -1343,15 +1351,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 _SkillCircle(label: "Flutter", percent: 95, color: Colors.blue),
                 _SkillCircle(
                   label: "Dart",
-                  percent: 90,
+                  percent: 92,
                   color: Colors.blueAccent,
                 ),
                 _SkillCircle(
-                  label: "Firebase",
-                  percent: 85,
+                  label: "REST APIs",
+                  percent: 88,
                   color: Colors.orange,
                 ),
-                _SkillCircle(label: "UI/UX", percent: 80, color: Colors.purple),
+                _SkillCircle(label: "UI/UX", percent: 85, color: Colors.purple),
               ],
             )
           : const Row(
@@ -1360,15 +1368,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 _SkillCircle(label: "Flutter", percent: 95, color: Colors.blue),
                 _SkillCircle(
                   label: "Dart",
-                  percent: 90,
+                  percent: 92,
                   color: Colors.blueAccent,
                 ),
                 _SkillCircle(
-                  label: "Firebase",
-                  percent: 85,
+                  label: "REST APIs",
+                  percent: 88,
                   color: Colors.orange,
                 ),
-                _SkillCircle(label: "UI/UX", percent: 80, color: Colors.purple),
+                _SkillCircle(label: "UI/UX", percent: 85, color: Colors.purple),
               ],
             ),
     );
@@ -1455,7 +1463,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     ),
                   ],
                 ),
-              );
+              ).animate().fadeIn(delay: (index * 100).ms).slideY(begin: 0.1);
             },
           ),
         ],

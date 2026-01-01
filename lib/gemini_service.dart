@@ -10,21 +10,25 @@ class GeminiService {
 
   Future<String> sendMessage(String message) async {
     try {
+      if (apiKey == "YOUR_GROQ_API_KEY_HERE" || apiKey.isEmpty) {
+        return "⚠️ API Key Missing: Please add your Groq API key to the `.env` file.\n\n"
+            "1. Go to console.groq.com\n"
+            "2. Create an API key\n"
+            "3. Paste it in `.env` like this:\n"
+            "   GEMINI_API_KEY=gsk_...\n\n"
+            "Then restart the app!";
+      }
+
       // Create a focused prompt with profile info and the question
+      final profileContext = ProfileData.getProfileContext();
       final prompt =
           '''You are answering questions about ${ProfileData.name}, a Flutter Developer.
 
-Profile Summary:
-- Name: ${ProfileData.name}
-- Title: ${ProfileData.title}
-- Location: ${ProfileData.location}
-- Skills: Flutter, Dart, JavaScript, REST APIs, Firebase, and more
-- Current Role: Flutter Developer at Join Venture AI
-- Notable Project: Goliaths app (on Google Play Store)
+$profileContext
 
 Question: $message
 
-Provide a brief, professional answer based on the profile information.''';
+Provide a brief, professional answer based on the profile information provided above. If asked about social media or projects, refer to the details in the profile.''';
 
       // Send a simple request without chat history to avoid token limits
       final response = await http.post(
@@ -34,7 +38,7 @@ Provide a brief, professional answer based on the profile information.''';
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'model': 'llama-3.1-8b-instant',
+          'model': 'llama-3.3-70b-versatile',
           'messages': [
             {'role': 'user', 'content': prompt},
           ],

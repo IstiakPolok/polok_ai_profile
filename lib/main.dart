@@ -576,7 +576,8 @@ class ProfileCodeView extends StatelessWidget {
 }
 
 class ChatView extends StatefulWidget {
-  const ChatView({super.key});
+  final bool isTerminalMode;
+  const ChatView({super.key, this.isTerminalMode = true});
 
   @override
   State<ChatView> createState() => _ChatViewState();
@@ -711,37 +712,159 @@ class _ChatViewState extends State<ChatView> {
     });
   }
 
+  Widget _buildTerminalMessage(ChatMessage msg) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                msg.isUser
+                    ? "user@polok-portfolio:~\$ "
+                    : "ai@polok-portfolio:~\$ ",
+                style: TextStyle(
+                  color: msg.isUser
+                      ? const Color(0xFF98C379)
+                      : const Color(0xFF61AFEF),
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  msg.text,
+                  style: const TextStyle(
+                    color: Color(0xFFD4D4D4),
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBubbleMessage(ChatMessage msg) {
+    return Align(
+      alignment: msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(12),
+        constraints: const BoxConstraints(maxWidth: 280),
+        decoration: BoxDecoration(
+          color: msg.isUser ? const Color(0xFFFF9C07) : const Color(0xFF252526),
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(msg.isUser ? 16 : 0),
+            bottomRight: Radius.circular(msg.isUser ? 0 : 16),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!msg.isUser)
+              const Row(
+                children: [
+                  Icon(Icons.auto_awesome, size: 12, color: Color(0xFFFF9C07)),
+                  SizedBox(width: 4),
+                  Text(
+                    "AI Assistant",
+                    style: TextStyle(
+                      color: Color(0xFFFF9C07),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            if (!msg.isUser) const SizedBox(height: 4),
+            Text(
+              msg.text,
+              style: TextStyle(
+                color: msg.isUser ? Colors.white : const Color(0xFFD4D4D4),
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Terminal Header
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: const Color(0xFF252526),
-          child: const Row(
-            children: [
-              Text(
-                "TERMINAL",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+        // Terminal Header - Only show in terminal mode
+        if (widget.isTerminalMode)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: const Color(0xFF252526),
+            child: const Row(
+              children: [
+                Text(
+                  "TERMINAL",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
-              SizedBox(width: 16),
-              Text(
-                "OUTPUT",
-                style: TextStyle(color: Colors.white54, fontSize: 12),
-              ),
-              SizedBox(width: 16),
-              Text(
-                "DEBUG CONSOLE",
-                style: TextStyle(color: Colors.white54, fontSize: 12),
-              ),
-            ],
+                SizedBox(width: 16),
+                Text(
+                  "OUTPUT",
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+                SizedBox(width: 16),
+                Text(
+                  "DEBUG CONSOLE",
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+              ],
+            ),
           ),
-        ),
+
+        // Bubble Header - For Portfolio mode
+        if (!widget.isTerminalMode)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: Color(0xFF252526),
+              border: Border(bottom: BorderSide(color: Color(0xFF333333))),
+            ),
+            child: const Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: Color(0xFFFF9C07),
+                  child: Icon(Icons.person, size: 14, color: Colors.white),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  "Polok's AI Chat",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         Expanded(
           child: Container(
             color: const Color(0xFF1E1E1E),
@@ -751,51 +874,55 @@ class _ChatViewState extends State<ChatView> {
               itemCount: _messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == _messages.length) {
-                  return const Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      "> AI is typing...",
-                      style: TextStyle(
-                        color: Color(0xFF569CD6),
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  );
-                }
-                final msg = _messages[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            msg.isUser
-                                ? "user@polok-portfolio:~\$ "
-                                : "ai@polok-portfolio:~\$ ",
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: widget.isTerminalMode
+                        ? const Text(
+                            "> AI is typing...",
                             style: TextStyle(
-                              color: msg.isUser
-                                  ? const Color(0xFF98C379)
-                                  : const Color(0xFF61AFEF),
+                              color: Color(0xFF569CD6),
                               fontFamily: 'monospace',
-                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              msg.text,
-                              style: const TextStyle(
-                                color: Color(0xFFD4D4D4),
-                                fontFamily: 'monospace',
+                          )
+                        : Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF252526),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Color(0xFFFF9C07),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "Typing...",
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
+                  );
+                }
+                final msg = _messages[index];
+                return widget.isTerminalMode
+                    ? _buildTerminalMessage(msg)
+                    : _buildBubbleMessage(msg);
               },
             ),
           ),
@@ -819,13 +946,15 @@ class _ChatViewState extends State<ChatView> {
               Expanded(
                 child: TextField(
                   controller: _controller,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontFamily: 'monospace',
+                    fontFamily: widget.isTerminalMode ? 'monospace' : null,
                   ),
-                  decoration: const InputDecoration(
-                    hintText: "Type a command...",
-                    hintStyle: TextStyle(color: Colors.white30),
+                  decoration: InputDecoration(
+                    hintText: widget.isTerminalMode
+                        ? "Type a command..."
+                        : "Ask me something...",
+                    hintStyle: const TextStyle(color: Colors.white30),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -916,7 +1045,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: const ChatView(),
+                          child: const ChatView(isTerminalMode: false),
                         ),
                       ).animate().scale(
                         duration: 300.ms,

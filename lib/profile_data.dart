@@ -2,11 +2,7 @@ class ProfileData {
   static const String name = "Fatin Istiak Polok";
   static const String title = "Flutter Developer";
   static const String bio = """
-Versatile professional with 4+ years of experience in graphic design, business management, 
-and web development, specializing in Flutter app development with API integration and 
-responsive UI. Skilled in building end-to-end mobile solutions, WordPress, and front-end 
-technologies. Experienced in managing projects from concept to deployment, with a published 
-app available on the Google Play Store.
+Versatile Flutter Developer with almost 2 years of specialized mobile development experience and 4+ years of business management experience. Skilled in scalable app architecture, API integration, responsive UI/UX, and production releases on the App Store and Google Play. Experienced with Apple and Google Play in-app purchases, RevenueCat, bKash, Stripe, Supabase, Google Maps, Firebase, and TestFlight.
 """;
 
   static const String email = "fatin15-1944@diu.edu.com";
@@ -17,103 +13,93 @@ app available on the Google Play Store.
   static const Map<String, String> socialLinks = {
     'GitHub': 'https://github.com/IstiakPolok',
     'LinkedIn': 'https://www.linkedin.com/in/fatin-istiak-polok-885574137/',
-    'Portfolio': 'http://www.polok.site',
+    'Portfolio': 'http://www.polok.com',
   };
 
   // Social Media Summary (from GitHub/LinkedIn Research)
   static const String githubSummary = """
-- Active GitHub user (IstiakPolok) with 800+ contributions in the last year.
-- Top Languages: Dart, C++, JavaScript, HTML, CSS.
-- Notable Repositories: book-class-assignment, liveTest, exam_week_2_assignment (focused on Dart and C++).
+- Active GitHub user (IstiakPolok) with strong contributions.
+- Top Languages: Dart, Python, JavaScript, HTML, CSS.
 """;
 
   static const String linkedinSummary = """
-- Headline: Flutter Dev || Management Executive || Graphics designer.
-- Currently working as a Flutter Mobile Application Developer at Join Venture AI.
-- Previous professional experience includes SM Technology, Flowline Artwork, and Eurobangla Associates.
+- Headline: Flutter Developer.
+- Versatile Flutter Developer with experience in production releases on App Store and Google Play.
 """;
 
   // Work Experience
   static const List<Map<String, String>> workExperience = [
     {
-      'company': 'Join Venture AI',
-      'position': 'Flutter Mobile Application Developer',
-      'duration': 'Jul 2025 - Present',
-      'description':
-          'Building scalable mobile solutions with Flutter and REST APIs.',
+      'company': 'Hook And Took Group',
+      'position': 'Flutter Developer',
+      'duration': 'Apr 2025 - Present',
+      'description': 'Mobile app development and production deployment.',
     },
     {
-      'company': 'SM Technology',
-      'position': 'Flutter Mobile Application Developer',
-      'duration': 'Apr 2025 - Jun 2025',
-      'description': 'Mobile app development for various clients.',
-    },
-    {
-      'company': 'Flowline Artwork (Watertec Malaysia)',
+      'company': 'Flowline Artwork',
       'position': 'Management Executive',
       'duration': 'Feb 2022 - Apr 2025',
-      'description':
-          'Oversaw internal operations and managed client relations for a subsidiary of Watertec Malaysia.',
+      'description': 'Business management and internal operations.',
     },
     {
       'company': 'Eurobangla Associates Ltd',
       'position': 'Business Administrator',
-      'duration': 'May 2021 - Jan 2022',
+      'duration': 'May 2021 - Feb 2022',
       'description': 'Managed administrative tasks and project delivery.',
-    },
-    {
-      'company': 'Unitas Group of Companies Ltd',
-      'position': 'Communications Executive',
-      'duration': 'Apr 2020 - Apr 2021',
-      'description': 'Handled internal and external communications.',
     },
   ];
 
   // Education
   static const List<Map<String, String>> education = [
     {
-      'institution': 'Daffodil International University, Bangladesh',
-      'degree': 'B.Sc. in Computer Science & Engineering (CSE)',
+      'institution': 'Daffodil International University',
+      'degree': 'B.Sc. in CSE',
       'duration': '2018 - 2023',
-      'description': 'Graduated with a CGPA of 3.23/4.00.',
+      'description': 'CGPA 3.23/4.00',
     },
     {
-      'institution': 'Cambrian College, Dhaka, Bangladesh',
-      'degree': 'Higher Secondary Certificate (Science)',
+      'institution': 'Cambrian College',
+      'degree': 'HSC (Science)',
       'duration': '2014 - 2016',
-      'description': 'Achieved GPA 4.50/5.00.',
+      'description': 'GPA 4.50/5.00',
     },
     {
-      'institution': 'Monipur High School, Dhaka, Bangladesh',
-      'degree': 'Secondary School Certificate (Science)',
+      'institution': 'Monipur High School',
+      'degree': 'SSC (Science)',
       'duration': '2004 - 2014',
-      'description': 'Achieved GPA 4.50/5.00.',
+      'description': 'GPA 4.41/5.00',
     },
   ];
 
   // Skills
   static const Map<String, List<String>> organizedSkills = {
     'Languages': [
-      'Dart (Flutter)',
-      'JavaScript',
-      'HTML',
-      'CSS',
+      'Dart',
       'Python',
-      'C',
-      'C++',
       'SQL',
+      'JavaScript',
     ],
-    'Technologies': [
+    'Frameworks': [
       'Flutter',
-      'GetX',
-      'REST APIs',
-      'WordPress',
       'FastAPI',
+      'Flask',
+      'WordPress',
+    ],
+    'Backend': [
+      'REST APIs',
+      'API Integration',
+    ],
+    'Databases': [
       'Firebase',
       'Supabase',
-      'Git',
+      'SQL Databases',
     ],
-    'Design': ['UI/UX Design', 'Graphic Design', 'Responsive Web Design'],
+    'DevOps & Cloud': [
+      'Git',
+      'Docker',
+      'Microsoft Azure',
+    ],
+    'Design': ['UI/UX Design', 'Graphic Design'],
   };
 
   // Flat skills list for compatibility
@@ -123,36 +109,29 @@ app available on the Google Play Store.
   // Projects
   static const List<Map<String, String>> projects = [
     {
-      'name': 'GastCallDe – Restaurant Management App',
-      'description':
-          'Built the mobile app for a multi-restaurant system with AI-powered order handling via Twilio, synced to React dashboards with menu, order, reservation, and customer management.',
-      'technologies': 'Flutter, Twilio, AI, REST API, Firebase',
+      'name': 'TrustTaste AI',
+      'description': 'Restaurant Management App.',
+      'technologies': 'Flutter, Twilio, AI, Firebase',
     },
     {
-      'name': 'Goliaths – Self-Growth and Donation App',
-      'description':
-          'Developed a self-growth app with donation via Stripe, daily motivational quotes, birthday tracking & sharing, AI chatbot for mental health guidance, and subscription management.',
+      'name': 'Goliaths',
+      'description': 'Self-Growth and Donation App.',
       'technologies': 'Flutter, Stripe, AI, Firebase',
-      'link':
-          'https://play.google.com/store/apps/details?id=com.breaking.goliathsitled',
     },
     {
-      'name': 'Roady – Tourmate Matching App',
-      'description':
-          'Developed a swipe-based travel companion app with real-time chat, user profiles, and map-sharing to connect travelers.',
-      'technologies': 'Flutter, Firebase, Google Maps, REST API',
+      'name': 'Qurany',
+      'description': 'AI-Powered Quranic Companion.',
+      'technologies': 'Flutter, GetX, RevenueCat, AI, Firebase',
     },
     {
-      'name': 'Dallas – Messaging App',
-      'description':
-          'Built a WhatsApp-like messaging app with secure real-time chat, audio/video calls, and AI-powered transcription for conversations.',
-      'technologies': 'Flutter, WebRTC, Firebase, REST API',
+      'name': 'CircleSlate',
+      'description': 'iOS Deployment via App Store Connect and TestFlight.',
+      'technologies': 'App Store Connect, TestFlight',
     },
     {
-      'name': 'WardKavin',
-      'description':
-          'Developed an AI-powered wound analysis and patient management application for nurses, enabling intelligent wound assessment through image analysis. The system suggests appropriate medications using AI insights, tracks wound healing history over time, and manages patient records efficiently. Built with a Flutter frontend and a Django backend.',
-      'technologies': 'Flutter, Django, OpenAI API',
+      'name': 'Chatter Matters',
+      'description': 'iOS & Android Deployment.',
+      'technologies': 'App Store Connect, Google Play Console',
     },
   ];
 
@@ -160,7 +139,7 @@ app available on the Google Play Store.
   static const List<String> languages = [
     'English - Fluent',
     'Bangla - Native',
-    'Hindi - Verbal',
+    'Hindi - Conversational',
   ];
 
   // Generate context for AI

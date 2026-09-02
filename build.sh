@@ -18,9 +18,10 @@ elif [ ! -f ".env" ]; then
   echo "Created empty .env placeholder"
 fi
 
-# Install Flutter if not present
-if [ ! -d "_flutter" ]; then
+# Install Flutter SDK if binary is not present
+if [ ! -f "_flutter/bin/flutter" ]; then
   echo "--- Cloning Flutter SDK ---"
+  rm -rf _flutter
   git clone https://github.com/flutter/flutter.git --depth 1 -b stable _flutter
 fi
 

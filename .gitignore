@@ -50,3 +50,4 @@ app.*.map.json
 .vercel
 .env*.local
 _flutter/
+.env*

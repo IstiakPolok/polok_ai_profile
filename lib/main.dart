@@ -590,9 +590,13 @@ class _ChatViewState extends State<ChatView> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
-  final GeminiService _geminiService = GeminiService(
-    dotenv.env['GEMINI_API_KEY'] ?? "",
-  );
+  static String _getApiKey() {
+    const envKey = String.fromEnvironment('GEMINI_API_KEY');
+    if (envKey.isNotEmpty) return envKey;
+    return dotenv.env['GEMINI_API_KEY'] ?? "";
+  }
+
+  late final GeminiService _geminiService = GeminiService(_getApiKey());
   bool _isLoading = false;
 
   // Voice features
@@ -660,7 +664,7 @@ class _ChatViewState extends State<ChatView> {
   }
 
   void _addInitialMessage() {
-    final apiKey = dotenv.env['GEMINI_API_KEY'] ?? "";
+    final apiKey = _getApiKey();
     final isPlaceholder = apiKey == "YOUR_GROQ_API_KEY_HERE" || apiKey.isEmpty;
 
     setState(() {

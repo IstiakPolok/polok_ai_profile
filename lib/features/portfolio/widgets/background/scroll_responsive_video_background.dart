@@ -115,8 +115,14 @@ class _ScrollResponsiveVideoBackgroundState
     if (totalDuration == Duration.zero) return;
 
     final now = DateTime.now();
+
+    // Watchdog: If seeking has been locked for over 250ms (decoder stalled or dropped event), release the lock
+    if (_isSeeking && now.difference(_lastSeekTime).inMilliseconds > 250) {
+      _isSeeking = false;
+    }
+
     // Seek to video position smoothly with proper pacing for the browser video decoder
-    if (now.difference(_lastSeekTime).inMilliseconds >= 45) {
+    if (!_isSeeking && now.difference(_lastSeekTime).inMilliseconds >= 35) {
       final int targetMs = (totalDuration.inMilliseconds * _currentProgress).round();
       final target = Duration(milliseconds: targetMs);
       if ((target - _controller.value.position).inMilliseconds.abs() > 20) {
@@ -145,7 +151,13 @@ class _ScrollResponsiveVideoBackgroundState
         })
         .catchError((_) {
           _isSeeking = false;
-        });
+        })
+        .timeout(
+          const Duration(milliseconds: 200),
+          onTimeout: () {
+            _isSeeking = false;
+          },
+        );
   }
 
   @override

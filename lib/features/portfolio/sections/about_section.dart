@@ -11,28 +11,17 @@ class AboutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = Image.asset(
-      'assets/images/image.png',
-      height: isMobile ? 300 : 400,
-      errorBuilder: (context, error, stackTrace) => Container(
-        height: isMobile ? 300 : 400,
-        width: isMobile ? 300 : 400,
-        decoration: const BoxDecoration(
-          color: AppColors.cardBg,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(Icons.person, size: 100, color: AppColors.primary),
-      ),
-    );
+    final alignRight = !isMobile;
 
     final content = Column(
-      crossAxisAlignment: isMobile
-          ? CrossAxisAlignment.center
-          : CrossAxisAlignment.start,
+      crossAxisAlignment: alignRight
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           ProfileData.bio,
-          textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          textAlign: alignRight ? TextAlign.right : TextAlign.center,
           style: const TextStyle(
             color: Colors.white70,
             height: 1.8,
@@ -63,34 +52,35 @@ class AboutSection extends StatelessWidget {
         horizontal: isMobile ? 20 : 100,
         vertical: 60,
       ),
-      child: Column(
-        children: [
-          const Text(
-            "About Me",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ).animate().fadeIn().slideX(begin: -0.2),
-          const SizedBox(height: 10),
-          const Text(
-            "Passionate about scalable mobile solutions & modern design.",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white54),
+      child: Align(
+        alignment: alignRight ? Alignment.centerRight : Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            crossAxisAlignment: alignRight
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "About Me",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              ).animate().fadeIn().slideX(begin: 0.2),
+              const SizedBox(height: 10),
+              Text(
+                "Passionate about scalable mobile solutions & modern design.",
+                textAlign: alignRight ? TextAlign.right : TextAlign.center,
+                style: const TextStyle(color: Colors.white54),
+              ),
+              const SizedBox(height: 40),
+              content,
+            ],
           ),
-          const SizedBox(height: 50),
-          if (isMobile)
-            Column(children: [image, const SizedBox(height: 30), content])
-          else
-            Row(
-              children: [
-                Expanded(child: image),
-                const SizedBox(width: 50),
-                Expanded(child: content),
-              ],
-            ),
-        ],
+        ),
       ),
     );
   }

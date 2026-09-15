@@ -4,11 +4,13 @@ import '../../../../core/constants/app_colors.dart';
 class HeaderSection extends StatelessWidget {
   final bool isMobile;
   final VoidCallback? onOpenDrawer;
+  final ValueChanged<int>? onNavigate;
 
   const HeaderSection({
     super.key,
     required this.isMobile,
     this.onOpenDrawer,
+    this.onNavigate,
   });
 
   @override
@@ -21,13 +23,19 @@ class HeaderSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            "POLOK",
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => onNavigate?.call(0),
+              child: const Text(
+                "POLOK",
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
             ),
           ),
           if (isMobile)
@@ -38,13 +46,13 @@ class HeaderSection extends StatelessWidget {
           else
             Row(
               children: [
-                _buildNavLink("Home"),
-                _buildNavLink("About me"),
-                _buildNavLink("Experience"),
-                _buildNavLink("Education"),
-                _buildNavLink("Skills"),
-                _buildNavLink("Projects"),
-                _buildNavLink("Contact me"),
+                _buildNavLink("Home", 0),
+                _buildNavLink("About me", 1),
+                _buildNavLink("Experience", 2),
+                _buildNavLink("Education", 3),
+                _buildNavLink("Skills", 4),
+                _buildNavLink("Projects", 5),
+                _buildNavLink("Contact me", 6),
               ],
             ),
         ],
@@ -52,19 +60,31 @@ class HeaderSection extends StatelessWidget {
     );
   }
 
-  Widget _buildNavLink(String text) {
+  Widget _buildNavLink(String text, int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white70, fontSize: 14),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => onNavigate?.call(index),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
 class PortfolioMobileDrawer extends StatelessWidget {
-  const PortfolioMobileDrawer({super.key});
+  final ValueChanged<int>? onNavigate;
+
+  const PortfolioMobileDrawer({super.key, this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -73,35 +93,47 @@ class PortfolioMobileDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: AppColors.primary),
+          DrawerHeader(
+            decoration: const BoxDecoration(color: AppColors.primary),
             child: Center(
-              child: Text(
-                "POLOK",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    onNavigate?.call(0);
+                  },
+                  child: const Text(
+                    "POLOK",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-          _buildDrawerItem("Home"),
-          _buildDrawerItem("About me"),
-          _buildDrawerItem("Experience"),
-          _buildDrawerItem("Education"),
-          _buildDrawerItem("Skills"),
-          _buildDrawerItem("Projects"),
-          _buildDrawerItem("Contact me"),
+          _buildDrawerItem(context, "Home", 0),
+          _buildDrawerItem(context, "About me", 1),
+          _buildDrawerItem(context, "Experience", 2),
+          _buildDrawerItem(context, "Education", 3),
+          _buildDrawerItem(context, "Skills", 4),
+          _buildDrawerItem(context, "Projects", 5),
+          _buildDrawerItem(context, "Contact me", 6),
         ],
       ),
     );
   }
 
-  Widget _buildDrawerItem(String title) {
+  Widget _buildDrawerItem(BuildContext context, String title, int index) {
     return ListTile(
       title: Text(title, style: const TextStyle(color: Colors.white)),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pop();
+        onNavigate?.call(index);
+      },
     );
   }
 }

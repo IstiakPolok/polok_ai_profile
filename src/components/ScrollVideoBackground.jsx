@@ -15,7 +15,7 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
   const targetTimeRef = useRef(0);
   const isSeekingRef = useRef(false);
   const pendingTargetRef = useRef(null);
-  const [videoSrc, setVideoSrc] = useState(cachedVideoBlobUrl || "/video/bgvideo.mp4");
+  const [videoSrc, setVideoSrc] = useState(cachedVideoBlobUrl || "/video/bgvideo.webm");
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Preload and cache entire video as a local blob in memory
@@ -26,7 +26,7 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
       return;
     }
 
-    fetch("/video/bgvideo.mp4")
+    fetch("/video/bgvideo.webm")
       .then((res) => {
         if (!res.ok) throw new Error("Network fetch failed");
         return res.blob();

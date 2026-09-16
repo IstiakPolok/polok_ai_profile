@@ -89,7 +89,7 @@ export function App() {
         });
 
         // 2. Preload video buffer
-        const videoPromise = fetch("/video/bgvideo.mp4")
+        const videoPromise = fetch("/video/bgvideo.webm")
           .then((res) => res.blob())
           .then(() => updateProgress())
           .catch(() => updateProgress());

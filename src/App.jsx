@@ -13,13 +13,20 @@ import {
   ChevronDown,
   ExternalLink,
   Code2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
 } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./components/SocialIcons";
 
 export function App() {
   const [currentSection, setCurrentSection] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [activeImageModal, setActiveImageModal] = useState(null);
   const containerRef = useRef(null);
+  const galleryScrollRef = useRef(null);
   const totalSections = 7;
 
   // Title swap animation index in Hero
@@ -60,6 +67,15 @@ export function App() {
       behavior: "smooth",
     });
     setCurrentSection(index);
+  };
+
+  const scrollGallery = (direction) => {
+    if (!galleryScrollRef.current) return;
+    const scrollAmount = 350;
+    galleryScrollRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -484,7 +500,8 @@ export function App() {
               {profileData.projects.map((proj, idx) => (
                 <div
                   key={idx}
-                  className="glass-card"
+                  className="glass-card project-card-clickable"
+                  onClick={() => setSelectedProject(proj)}
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -494,15 +511,32 @@ export function App() {
                 >
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px", gap: "8px" }}>
-                      <h3
-                        style={{
-                          fontSize: "17px",
-                          color: "#FFFFFF",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {proj.name}
-                      </h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <h3
+                          style={{
+                            fontSize: "17px",
+                            color: "#FFFFFF",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {proj.name}
+                        </h3>
+                        {proj.images && proj.images.length > 0 && (
+                          <span
+                            title="Has screenshots gallery"
+                            style={{
+                              fontSize: "10px",
+                              color: "var(--primary-light)",
+                              border: "1px solid rgba(8, 88, 156, 0.4)",
+                              background: "rgba(8, 88, 156, 0.2)",
+                              borderRadius: "4px",
+                              padding: "1px 5px",
+                            }}
+                          >
+                            {proj.images.length} photos
+                          </span>
+                        )}
+                      </div>
                       {proj.subtitle && (
                         <span
                           style={{
@@ -531,25 +565,30 @@ export function App() {
                   </div>
 
                   <div>
-                    {proj.links && proj.links.length > 0 && (
-                      <div style={{ display: "flex", gap: "10px", marginBottom: "8px", justifyContent: "flex-end" }}>
-                        {proj.links.map((lnk, lIdx) => (
-                          <span
-                            key={lIdx}
-                            style={{
-                              fontSize: "11px",
-                              color: "#FFFFFF",
-                              background: "rgba(8, 88, 156, 0.3)",
-                              border: "1px solid rgba(8, 88, 156, 0.5)",
-                              borderRadius: "4px",
-                              padding: "2px 6px",
-                            }}
-                          >
-                            {lnk.label}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "11px", color: "var(--primary-light)", opacity: 0.85 }}>
+                        Click to expand ↗
+                      </span>
+                      {proj.links && proj.links.length > 0 && (
+                        <div style={{ display: "flex", gap: "6px" }}>
+                          {proj.links.map((lnk, lIdx) => (
+                            <span
+                              key={lIdx}
+                              style={{
+                                fontSize: "11px",
+                                color: "#FFFFFF",
+                                background: "rgba(8, 88, 156, 0.3)",
+                                border: "1px solid rgba(8, 88, 156, 0.5)",
+                                borderRadius: "4px",
+                                padding: "2px 6px",
+                              }}
+                            >
+                              {lnk.label}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <div
                       style={{
                         fontSize: "11px",
@@ -676,6 +715,198 @@ export function App() {
           </div>
         </section>
       </main>
+
+      {/* EXPANDED PROJECT MODAL */}
+      {selectedProject && (
+        <div
+          className="project-modal-backdrop"
+          onClick={() => setSelectedProject(null)}
+        >
+          <div
+            className="project-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="project-modal-header">
+              <div>
+                <h2 className="project-modal-title">{selectedProject.name}</h2>
+                <div className="project-modal-subtitle">
+                  {selectedProject.subtitle || "Mobile Application Project"}
+                </div>
+              </div>
+              <button
+                className="project-modal-close"
+                onClick={() => setSelectedProject(null)}
+                aria-label="Close project modal"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="project-modal-body">
+              {/* Horizontal Scrolling Gallery */}
+              {selectedProject.images && selectedProject.images.length > 0 ? (
+                <div className="project-gallery-wrapper">
+                  <div className="gallery-scroll-header">
+                    <span className="gallery-scroll-title">
+                      Screenshots & Visuals ({selectedProject.images.length})
+                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span className="gallery-scroll-hint">Scroll horizontally ↔</span>
+                      <button
+                        onClick={() => scrollGallery("left")}
+                        style={{
+                          background: "rgba(8, 88, 156, 0.25)",
+                          border: "1px solid rgba(8, 88, 156, 0.4)",
+                          color: "#fff",
+                          borderRadius: "50%",
+                          width: "30px",
+                          height: "30px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        aria-label="Scroll left"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        onClick={() => scrollGallery("right")}
+                        style={{
+                          background: "rgba(8, 88, 156, 0.25)",
+                          border: "1px solid rgba(8, 88, 156, 0.4)",
+                          color: "#fff",
+                          borderRadius: "50%",
+                          width: "30px",
+                          height: "30px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        aria-label="Scroll right"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="project-gallery-scroll" ref={galleryScrollRef}>
+                    {selectedProject.images.map((imgSrc, imgIdx) => (
+                      <div
+                        key={imgIdx}
+                        className="project-screenshot-card"
+                        onClick={() => setActiveImageModal(imgSrc)}
+                        title="Click to view full image"
+                      >
+                        <img
+                          src={imgSrc}
+                          alt={`${selectedProject.name} Screenshot ${imgIdx + 1}`}
+                          className="project-screenshot-img"
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Project Details & Description */}
+              <div className="project-modal-details">
+                <p className="project-modal-desc">
+                  {selectedProject.description}
+                </p>
+
+                <div className="project-modal-tech">
+                  <span className="project-modal-tech-label">Technologies:</span>
+                  {selectedProject.technologies.split(",").map((tech, tIdx) => (
+                    <span key={tIdx} className="project-modal-tech-item">
+                      {tech.trim()}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Project Links & Action Buttons */}
+                {selectedProject.links && selectedProject.links.length > 0 && (
+                  <div className="project-modal-actions">
+                    {selectedProject.links.map((lnk, lIdx) => (
+                      <a
+                        key={lIdx}
+                        href={lnk.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn-primary"
+                        style={{ padding: "10px 22px", fontSize: "14px" }}
+                      >
+                        <ExternalLink size={15} />
+                        {lnk.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FULLSCREEN IMAGE ZOOM MODAL */}
+      {activeImageModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0, 0, 0, 0.95)",
+            zIndex: 400,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            boxSizing: "border-box",
+          }}
+          onClick={() => setActiveImageModal(null)}
+        >
+          <button
+            onClick={() => setActiveImageModal(null)}
+            style={{
+              position: "absolute",
+              top: "24px",
+              right: "28px",
+              background: "rgba(255, 255, 255, 0.15)",
+              border: "none",
+              borderRadius: "50%",
+              width: "44px",
+              height: "44px",
+              color: "#fff",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s ease",
+            }}
+            aria-label="Close zoomed image"
+          >
+            <X size={26} />
+          </button>
+          <img
+            src={activeImageModal}
+            alt="Expanded view"
+            style={{
+              maxWidth: "92vw",
+              maxHeight: "92vh",
+              objectFit: "contain",
+              borderRadius: "12px",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.8)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

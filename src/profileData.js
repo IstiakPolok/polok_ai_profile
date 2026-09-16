@@ -100,6 +100,18 @@ export const profileData = {
       links: [
         { label: "TestFlight (Beta)", url: "#" },
       ],
+      images: [
+        new URL("./assets/project/qurani/1.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/2.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/3.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/4.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/5.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/6.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/7.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/8.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/9.jpg", import.meta.url).href,
+        new URL("./assets/project/qurani/10.jpg", import.meta.url).href,
+      ],
     },
     {
       name: "CircleSlate",

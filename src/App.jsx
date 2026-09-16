@@ -25,16 +25,12 @@ export function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeImageModal, setActiveImageModal] = useState(null);
-  const [isAssetsLoaded, setIsAssetsLoaded] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [loadPercent, setLoadPercent] = useState(15);
   const containerRef = useRef(null);
   const galleryScrollRef = useRef(null);
   const scrollRafRef = useRef(null);
   const totalSections = 7;
-
-  // The website is only considered fully loaded when both assets are cached AND video decoder is primed
-  const isFullyLoaded = isAssetsLoaded && isVideoReady;
 
   // Title swap animation index in Hero
   const [titleIndex, setTitleIndex] = useState(0);
@@ -72,7 +68,7 @@ export function App() {
         // Helper to report progress
         const updateProgress = () => {
           loadedCount++;
-          const pct = Math.min(95, Math.round((loadedCount / totalItems) * 95));
+          const pct = Math.min(100, Math.round((loadedCount / totalItems) * 100));
           if (!isCancelled) setLoadPercent(pct);
         };
 
@@ -92,56 +88,37 @@ export function App() {
           });
         });
 
-        // 2. Preload video buffer and save as reusable blob
+        // 2. Preload video buffer
         const videoPromise = fetch("/video/bgvideo.mp4")
-          .then((res) => {
-            if (!res.ok) throw new Error("Video fetch failed");
-            return res.blob();
-          })
-          .then((blob) => {
-            if (!window.__cachedVideoBlobUrl) {
-              window.__cachedVideoBlobUrl = URL.createObjectURL(blob);
-            }
-            updateProgress();
-          })
-          .catch((err) => {
-            console.warn("Video preload note:", err);
-            updateProgress();
-          });
+          .then((res) => res.blob())
+          .then(() => updateProgress())
+          .catch(() => updateProgress());
 
         await Promise.all([...imagePromises, videoPromise]);
 
         if (!isCancelled) {
-          setIsAssetsLoaded(true);
+          setLoadPercent(100);
+          setTimeout(() => {
+            if (!isCancelled) setIsFullyLoaded(true);
+          }, 300);
         }
       } catch {
-        if (!isCancelled) setIsAssetsLoaded(true);
+        if (!isCancelled) setIsFullyLoaded(true);
       }
     };
 
     preloadAllAssets();
 
-    // Fallback maximum safety timer
+    // Fallback maximum wait of 4s so page always reveals smoothly
     const fallbackTimer = setTimeout(() => {
-      if (!isCancelled) {
-        setIsAssetsLoaded(true);
-        setIsVideoReady(true);
-        setLoadPercent(100);
-      }
-    }, 8000);
+      if (!isCancelled) setIsFullyLoaded(true);
+    }, 4000);
 
     return () => {
       isCancelled = true;
       clearTimeout(fallbackTimer);
     };
   }, []);
-
-  // Update loadPercent to 100% when video is primed
-  useEffect(() => {
-    if (isVideoReady && isAssetsLoaded) {
-      setLoadPercent(100);
-    }
-  }, [isVideoReady, isAssetsLoaded]);
 
   // RAF-throttled scroll handler for buttery-smooth 60-120fps scrubbing without CPU bottleneck
   const handleScroll = (e) => {

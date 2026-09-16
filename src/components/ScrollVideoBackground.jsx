@@ -18,12 +18,31 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
   const [videoSrc, setVideoSrc] = useState(cachedVideoBlobUrl || "/video/bgvideo.mp4");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Use window-level blob cache if available from App's preload
+  // Preload and cache entire video as a local blob in memory
   useEffect(() => {
-    if (window.__cachedVideoBlobUrl && !cachedVideoBlobUrl) {
-      cachedVideoBlobUrl = window.__cachedVideoBlobUrl;
+    let active = true;
+    if (cachedVideoBlobUrl) {
       setVideoSrc(cachedVideoBlobUrl);
+      return;
     }
+
+    fetch("/video/bgvideo.mp4")
+      .then((res) => {
+        if (!res.ok) throw new Error("Network fetch failed");
+        return res.blob();
+      })
+      .then((blob) => {
+        if (!active) return;
+        cachedVideoBlobUrl = URL.createObjectURL(blob);
+        setVideoSrc(cachedVideoBlobUrl);
+      })
+      .catch((err) => {
+        console.warn("Video blob memory caching fallback to direct url:", err);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Update target scrub time immediately upon scroll
@@ -67,21 +86,12 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
 
   useEffect(() => {
     const video = videoRef.current;
-    const markReady = () => {
-      if (!isLoaded) {
-        setIsLoaded(true);
-        if (typeof onReady === "function") {
-          onReady();
-        }
-      }
-    };
+    if (!video) return;
 
     const onCanPlayThrough = () => {
-      // Warm up the GPU decoder
-      if (video.currentTime === 0) {
-        markReady();
-      } else {
-        video.currentTime = 0;
+      setIsLoaded(true);
+      if (typeof onReady === "function") {
+        onReady();
       }
     };
 
@@ -89,12 +99,17 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
       video.pause();
       targetTimeRef.current = scrollProgress * video.duration;
       requestSeek(targetTimeRef.current);
+      // If already ready to play all frames without buffering
+      if (video.readyState >= 4) {
+        setIsLoaded(true);
+        if (typeof onReady === "function") {
+          onReady();
+        }
+      }
     };
 
     const onSeeked = () => {
       isSeekingRef.current = false;
-      markReady();
-
       if (pendingTargetRef.current !== null) {
         const next = pendingTargetRef.current;
         pendingTargetRef.current = null;
@@ -102,20 +117,13 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
       }
     };
 
-    // Check if video is already buffered / primed
-    if (video.readyState >= 3) {
-      markReady();
-    }
-
     video.addEventListener("loadedmetadata", onLoadedMetadata);
     video.addEventListener("canplaythrough", onCanPlayThrough);
-    video.addEventListener("canplay", markReady);
     video.addEventListener("seeked", onSeeked);
 
     return () => {
       video.removeEventListener("loadedmetadata", onLoadedMetadata);
       video.removeEventListener("canplaythrough", onCanPlayThrough);
-      video.removeEventListener("canplay", markReady);
       video.removeEventListener("seeked", onSeeked);
     };
   }, [scrollProgress]);

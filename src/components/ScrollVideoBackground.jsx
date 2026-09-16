@@ -21,10 +21,7 @@ export const ScrollVideoBackground = ({ scrollProgress }) => {
   useEffect(() => {
     let active = true;
     fetch("/video/bgvideo.mp4")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.blob();
-      })
+      .then((res) => res.blob())
       .then((blob) => {
         if (!active) return;
         const blobUrl = URL.createObjectURL(blob);
@@ -32,7 +29,6 @@ export const ScrollVideoBackground = ({ scrollProgress }) => {
       })
       .catch((err) => {
         console.warn("Video blob preload error (using direct URL fallback):", err);
-        setVideoSrc("/video/bgvideo.mp4");
       });
 
     return () => {
@@ -43,12 +39,11 @@ export const ScrollVideoBackground = ({ scrollProgress }) => {
   // Update target scrub time immediately upon scroll
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || isNaN(video.duration) || video.duration === 0) return;
 
-    const duration = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 24.0;
-    targetTimeRef.current = scrollProgress * duration;
+    targetTimeRef.current = scrollProgress * video.duration;
 
-    // Trigger seek
+    // Trigger immediate seek if not currently seeking
     requestSeek(targetTimeRef.current);
   }, [scrollProgress]);
 

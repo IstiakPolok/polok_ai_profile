@@ -107,11 +107,13 @@ export function App() {
 
             <h1
               style={{
+                fontFamily: "var(--font-heading)",
                 fontSize: "clamp(36px, 5vw, 54px)",
                 fontWeight: 800,
                 color: "#FFFFFF",
                 marginBottom: "12px",
                 lineHeight: 1.15,
+                letterSpacing: "0.5px",
               }}
             >
               {profileData.name}
@@ -120,6 +122,7 @@ export function App() {
             {/* Dynamic Swapping Title */}
             <div
               style={{
+                fontFamily: "var(--font-heading)",
                 fontSize: "clamp(20px, 3vw, 28px)",
                 color: "var(--primary-light)",
                 fontWeight: 600,

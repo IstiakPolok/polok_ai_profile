@@ -1,4 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Syne:wght@700;800&family=Cabinet+Grotesk:wght@700;800;900&display=swap');
+
+/* Berghan Custom Font definitions */
+@font-face {
+  font-family: 'Berghan';
+  src: url('/fonts/Berghan.woff2') format('woff2'),
+       url('/fonts/Berghan.woff') format('woff'),
+       url('/fonts/Berghan.otf') format('opentype'),
+       url('/fonts/Berghan.ttf') format('truetype');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berghan';
+  src: url('/fonts/Berghan-Regular.woff2') format('woff2'),
+       url('/fonts/Berghan-Regular.woff') format('woff'),
+       url('/fonts/Berghan-Regular.otf') format('opentype'),
+       url('/fonts/Berghan-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --primary: #08589C;
@@ -9,6 +32,7 @@
   --border-color: rgba(8, 88, 156, 0.35);
   --text-muted: rgba(255, 255, 255, 0.65);
   --text-light: #FFFFFF;
+  --font-heading: 'Berghan', 'Cabinet Grotesk', 'Syne', sans-serif;
 }
 
 * {
@@ -62,6 +86,7 @@ html, body {
 }
 
 .brand-logo {
+  font-family: var(--font-heading);
   color: var(--primary);
   font-size: 26px;
   font-weight: 800;
@@ -198,6 +223,10 @@ html, body {
   }
 }
 
+h1, h2, h3, h4, .section-title {
+  font-family: var(--font-heading);
+}
+
 .section-title {
   font-size: 34px;
   font-weight: 700;
@@ -320,6 +349,7 @@ html, body {
 }
 
 .stat-val {
+  font-family: var(--font-heading);
   font-size: 30px;
   font-weight: 700;
   color: var(--primary);

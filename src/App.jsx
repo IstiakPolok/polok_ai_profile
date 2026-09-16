@@ -25,7 +25,8 @@ export function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeImageModal, setActiveImageModal] = useState(null);
-  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isFullyLoaded, setIsFullyLoaded] = useState(false);
+  const [loadPercent, setLoadPercent] = useState(15);
   const containerRef = useRef(null);
   const galleryScrollRef = useRef(null);
   const scrollRafRef = useRef(null);
@@ -47,12 +48,76 @@ export function App() {
     return () => clearInterval(interval);
   }, [titles.length]);
 
-  // Safety timer: always dismiss loading screen after 1.8s max even if connection is slow
+  // Pre-load all critical assets (video + project thumbnails) into browser cache before unveiling
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVideoReady(true);
-    }, 1800);
-    return () => clearTimeout(timer);
+    let isCancelled = false;
+
+    const preloadAllAssets = async () => {
+      try {
+        // Collect all project images to cache
+        const allImages = [];
+        profileData.projects.forEach((p) => {
+          if (p.images) {
+            allImages.push(...p.images);
+          }
+        });
+
+        let loadedCount = 0;
+        const totalItems = allImages.length + 1; // images + video
+
+        // Helper to report progress
+        const updateProgress = () => {
+          loadedCount++;
+          const pct = Math.min(100, Math.round((loadedCount / totalItems) * 100));
+          if (!isCancelled) setLoadPercent(pct);
+        };
+
+        // 1. Preload images via new Image()
+        const imagePromises = allImages.map((src) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              updateProgress();
+              resolve();
+            };
+            img.onerror = () => {
+              updateProgress();
+              resolve();
+            };
+            img.src = src;
+          });
+        });
+
+        // 2. Preload video buffer
+        const videoPromise = fetch("/video/bgvideo.mp4")
+          .then((res) => res.blob())
+          .then(() => updateProgress())
+          .catch(() => updateProgress());
+
+        await Promise.all([...imagePromises, videoPromise]);
+
+        if (!isCancelled) {
+          setLoadPercent(100);
+          setTimeout(() => {
+            if (!isCancelled) setIsFullyLoaded(true);
+          }, 300);
+        }
+      } catch {
+        if (!isCancelled) setIsFullyLoaded(true);
+      }
+    };
+
+    preloadAllAssets();
+
+    // Fallback maximum wait of 4s so page always reveals smoothly
+    const fallbackTimer = setTimeout(() => {
+      if (!isCancelled) setIsFullyLoaded(true);
+    }, 4000);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   // RAF-throttled scroll handler for buttery-smooth 60-120fps scrubbing without CPU bottleneck
@@ -102,12 +167,19 @@ export function App() {
 
       {/* Initial Smooth Preload Curtain */}
       <div
-        className={`app-preloader ${isVideoReady ? "loaded" : ""}`}
-        aria-hidden={isVideoReady}
+        className={`app-preloader ${isFullyLoaded ? "loaded" : ""}`}
+        aria-hidden={isFullyLoaded}
       >
         <div className="preloader-content">
+          <img src="/favicon.png" alt="Logo" className="preloader-logo" />
           <div className="preloader-spinner" />
-          <span className="preloader-text">OPTIMIZING EXPERIENCE...</span>
+          <span className="preloader-text">PREPARING ASSETS {loadPercent}%</span>
+          <div className="preloader-bar-bg">
+            <div
+              className="preloader-bar-fill"
+              style={{ width: `${loadPercent}%` }}
+            />
+          </div>
         </div>
       </div>
 

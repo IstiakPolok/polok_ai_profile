@@ -88,14 +88,24 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
     const video = videoRef.current;
     if (!video) return;
 
-    const onLoadedMetadata = () => {
-      video.pause();
+    const onCanPlayThrough = () => {
       setIsLoaded(true);
       if (typeof onReady === "function") {
         onReady();
       }
+    };
+
+    const onLoadedMetadata = () => {
+      video.pause();
       targetTimeRef.current = scrollProgress * video.duration;
       requestSeek(targetTimeRef.current);
+      // If already ready to play all frames without buffering
+      if (video.readyState >= 4) {
+        setIsLoaded(true);
+        if (typeof onReady === "function") {
+          onReady();
+        }
+      }
     };
 
     const onSeeked = () => {
@@ -108,10 +118,12 @@ export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
     };
 
     video.addEventListener("loadedmetadata", onLoadedMetadata);
+    video.addEventListener("canplaythrough", onCanPlayThrough);
     video.addEventListener("seeked", onSeeked);
 
     return () => {
       video.removeEventListener("loadedmetadata", onLoadedMetadata);
+      video.removeEventListener("canplaythrough", onCanPlayThrough);
       video.removeEventListener("seeked", onSeeked);
     };
   }, [scrollProgress]);

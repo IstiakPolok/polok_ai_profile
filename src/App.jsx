@@ -276,6 +276,16 @@ export function App() {
                     {profileData.phone}
                   </span>
                 </div>
+                {profileData.languages && (
+                  <div>
+                    <span style={{ color: "var(--primary-light)", fontSize: "12px", display: "block" }}>
+                      Languages
+                    </span>
+                    <span style={{ color: "#FFFFFF", fontSize: "13px", fontWeight: 500 }}>
+                      {profileData.languages.map((l) => `${l.name} (${l.level})`).join(", ")}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -329,9 +339,28 @@ export function App() {
                   <div style={{ color: "var(--primary-light)", fontSize: "14px", fontWeight: 600, marginBottom: "8px" }}>
                     {exp.company}
                   </div>
-                  <p style={{ color: "var(--text-muted)", fontSize: "14px", lineHeight: 1.6 }}>
+                  <p style={{ color: "var(--text-muted)", fontSize: "14px", lineHeight: 1.6, marginBottom: exp.tags ? "10px" : "0" }}>
                     {exp.description}
                   </p>
+                  {exp.tags && (
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                      {exp.tags.map((t) => (
+                        <span
+                          key={t}
+                          style={{
+                            fontSize: "11px",
+                            color: "var(--primary-light)",
+                            background: "rgba(8, 88, 156, 0.15)",
+                            border: "1px solid rgba(8, 88, 156, 0.35)",
+                            padding: "2px 8px",
+                            borderRadius: "6px",
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -377,7 +406,7 @@ export function App() {
                     {edu.institution}
                   </div>
                   <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-                    {edu.description}
+                    {edu.grade || edu.description}
                   </p>
                 </div>
               ))}
@@ -464,16 +493,31 @@ export function App() {
                   }}
                 >
                   <div>
-                    <h3
-                      style={{
-                        fontSize: "17px",
-                        color: "#FFFFFF",
-                        fontWeight: 700,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      {proj.name}
-                    </h3>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px", gap: "8px" }}>
+                      <h3
+                        style={{
+                          fontSize: "17px",
+                          color: "#FFFFFF",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {proj.name}
+                      </h3>
+                      {proj.subtitle && (
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            color: "var(--primary-light)",
+                            background: "rgba(8, 88, 156, 0.2)",
+                            padding: "2px 8px",
+                            borderRadius: "10px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {proj.subtitle}
+                        </span>
+                      )}
+                    </div>
                     <p
                       style={{
                         color: "var(--text-muted)",
@@ -486,16 +530,37 @@ export function App() {
                     </p>
                   </div>
 
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      color: "var(--primary-light)",
-                      borderTop: "1px solid rgba(8, 88, 156, 0.2)",
-                      paddingTop: "10px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {proj.technologies}
+                  <div>
+                    {proj.links && proj.links.length > 0 && (
+                      <div style={{ display: "flex", gap: "10px", marginBottom: "8px", justifyContent: "flex-end" }}>
+                        {proj.links.map((lnk, lIdx) => (
+                          <span
+                            key={lIdx}
+                            style={{
+                              fontSize: "11px",
+                              color: "#FFFFFF",
+                              background: "rgba(8, 88, 156, 0.3)",
+                              border: "1px solid rgba(8, 88, 156, 0.5)",
+                              borderRadius: "4px",
+                              padding: "2px 6px",
+                            }}
+                          >
+                            {lnk.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--primary-light)",
+                        borderTop: "1px solid rgba(8, 88, 156, 0.2)",
+                        paddingTop: "10px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {proj.technologies}
+                    </div>
                   </div>
                 </div>
               ))}

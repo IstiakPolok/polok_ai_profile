@@ -21,7 +21,7 @@ export const Header = ({ currentSection, onNavigate }) => {
 
   return (
     <>
-      <header className="site-header">
+      <header className={`site-header ${currentSection === 0 ? "hero-header" : ""}`}>
         <div className="brand-logo" onClick={() => handleNav(0)}>
           POLOK
         </div>

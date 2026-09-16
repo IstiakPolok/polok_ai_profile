@@ -725,3 +725,59 @@ h1, h2, h3, h4, .section-title {
   flex-wrap: wrap;
 }
 
+/* Elegant Preloader Curtain */
+.app-preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0A0A0D;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s ease;
+  pointer-events: all;
+}
+
+.app-preloader.loaded {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.preloader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(8, 88, 156, 0.2);
+  border-top-color: var(--primary-light);
+  border-radius: 50%;
+  animation: spinLoader 0.8s linear infinite;
+}
+
+@keyframes spinLoader {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.preloader-text {
+  font-family: var(--font-heading);
+  color: var(--primary-light);
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+

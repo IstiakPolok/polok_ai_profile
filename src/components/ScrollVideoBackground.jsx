@@ -1,34 +1,43 @@
 import React, { useEffect, useRef, useState } from "react";
 
+let cachedVideoBlobUrl = null;
+
 /**
  * ScrollVideoBackground
  *
  * Provides buttery-smooth, hardware-accelerated video scrubbing:
- * 1. Preloads the video buffer in memory via Blob URL for instantaneous seeking.
- * 2. Uses fastSeek() if supported by the browser GPU decoder, with graceful fallback to currentTime.
- * 3. Respects browser 'seeking' / 'seeked' pipeline to avoid queue-flooding and stutter.
- * 4. Renders on an accelerated layer with will-change and transform3d.
+ * 1. Caches the 2.8MB video in browser RAM/Blob URL so seeking produces 0 network or disk operations.
+ * 2. Uses requestAnimationFrame throttled seeking to match display refresh rate (60-144 Hz).
+ * 3. Gracefully notifies parent when buffer is ready for zero-lag smooth experience.
  */
-export const ScrollVideoBackground = ({ scrollProgress }) => {
+export const ScrollVideoBackground = ({ scrollProgress, onReady }) => {
   const videoRef = useRef(null);
   const targetTimeRef = useRef(0);
   const isSeekingRef = useRef(false);
   const pendingTargetRef = useRef(null);
-  const [videoSrc, setVideoSrc] = useState("/video/bgvideo.mp4");
+  const [videoSrc, setVideoSrc] = useState(cachedVideoBlobUrl || "/video/bgvideo.mp4");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Preload entire video as a local blob so that scrubbing requires 0 network latency & 0 disk reads
+  // Preload and cache entire video as a local blob in memory
   useEffect(() => {
     let active = true;
+    if (cachedVideoBlobUrl) {
+      setVideoSrc(cachedVideoBlobUrl);
+      return;
+    }
+
     fetch("/video/bgvideo.mp4")
-      .then((res) => res.blob())
+      .then((res) => {
+        if (!res.ok) throw new Error("Network fetch failed");
+        return res.blob();
+      })
       .then((blob) => {
         if (!active) return;
-        const blobUrl = URL.createObjectURL(blob);
-        setVideoSrc(blobUrl);
+        cachedVideoBlobUrl = URL.createObjectURL(blob);
+        setVideoSrc(cachedVideoBlobUrl);
       })
       .catch((err) => {
-        console.warn("Video blob preload error (using direct URL fallback):", err);
+        console.warn("Video blob memory caching fallback to direct url:", err);
       });
 
     return () => {
@@ -82,6 +91,9 @@ export const ScrollVideoBackground = ({ scrollProgress }) => {
     const onLoadedMetadata = () => {
       video.pause();
       setIsLoaded(true);
+      if (typeof onReady === "function") {
+        onReady();
+      }
       targetTimeRef.current = scrollProgress * video.duration;
       requestSeek(targetTimeRef.current);
     };

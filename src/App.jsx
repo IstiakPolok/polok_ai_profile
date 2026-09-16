@@ -25,8 +25,10 @@ export function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeImageModal, setActiveImageModal] = useState(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const containerRef = useRef(null);
   const galleryScrollRef = useRef(null);
+  const scrollRafRef = useRef(null);
   const totalSections = 7;
 
   // Title swap animation index in Hero
@@ -45,17 +47,29 @@ export function App() {
     return () => clearInterval(interval);
   }, [titles.length]);
 
-  // Handle scroll progress and update currentSection & video scrub progress
+  // Safety timer: always dismiss loading screen after 1.8s max even if connection is slow
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVideoReady(true);
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // RAF-throttled scroll handler for buttery-smooth 60-120fps scrubbing without CPU bottleneck
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-    const maxScroll = scrollHeight - clientHeight;
-    if (maxScroll <= 0) return;
+    if (scrollRafRef.current) return;
 
-    const progress = Math.min(1, Math.max(0, scrollTop / maxScroll));
-    setScrollProgress(progress);
-
-    const sectionIndex = Math.round(scrollTop / clientHeight);
-    setCurrentSection(sectionIndex);
+    scrollRafRef.current = requestAnimationFrame(() => {
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll > 0) {
+        const progress = Math.min(1, Math.max(0, scrollTop / maxScroll));
+        setScrollProgress(progress);
+        const sectionIndex = Math.round(scrollTop / clientHeight);
+        setCurrentSection(sectionIndex);
+      }
+      scrollRafRef.current = null;
+    });
   };
 
   // Smooth jump to section
@@ -81,7 +95,21 @@ export function App() {
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden" }}>
       {/* Native 60 FPS Hardware-Accelerated Video Background */}
-      <ScrollVideoBackground scrollProgress={scrollProgress} />
+      <ScrollVideoBackground
+        scrollProgress={scrollProgress}
+        onReady={() => setIsVideoReady(true)}
+      />
+
+      {/* Initial Smooth Preload Curtain */}
+      <div
+        className={`app-preloader ${isVideoReady ? "loaded" : ""}`}
+        aria-hidden={isVideoReady}
+      >
+        <div className="preloader-content">
+          <div className="preloader-spinner" />
+          <span className="preloader-text">OPTIMIZING EXPERIENCE...</span>
+        </div>
+      </div>
 
       {/* Fixed Header */}
       <Header currentSection={currentSection} onNavigate={scrollToSection} />

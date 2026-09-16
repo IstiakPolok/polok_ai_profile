@@ -21,6 +21,10 @@ import {
 import { GithubIcon, LinkedinIcon } from "./components/SocialIcons";
 
 export function App() {
+  const [currentSection, setCurrentSection] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [activeImageModal, setActiveImageModal] = useState(null);
   const [isAssetsLoaded, setIsAssetsLoaded] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [loadPercent, setLoadPercent] = useState(15);

@@ -162,7 +162,6 @@ export function App() {
       {/* Native 60 FPS Hardware-Accelerated Video Background */}
       <ScrollVideoBackground
         scrollProgress={scrollProgress}
-        onReady={() => setIsVideoReady(true)}
       />
 
       {/* Initial Smooth Preload Curtain */}
